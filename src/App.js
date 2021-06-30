@@ -1,73 +1,57 @@
-import './App.css';
-import React, { useEffect, useState } from 'react';
-import { getRules } from './services/dataService';
-import parser from './services/parser';
-import TableOfContents from './contents/Contents';
-import { Container, Grid, Loader } from 'semantic-ui-react';
-import 'semantic-ui-css/semantic.min.css';
-import MainContent from './main';
+import React, { useState, useEffect } from 'react';
+import dataService from './services/dataService';
+import parser from './services/parser'
+import { Input, Loader, Icon, Container, Header, Segment } from 'semantic-ui-react';
+import 'semantic-ui-css/semantic.min.css'
+import Hide from './Components/Hide'
+import Contents from './Contents';
 
-function App() {
-	const [rules, setRules] = useState([]);
-	const [contents, setContents] = useState([]);
-	const [glossary, setGlossary] = useState([]);
-	const [isLoading, setIsLoading] = useState(true);
-	const [selectedSection, setSelectedSection] = useState({});
-	const [lastSection, setLastSection] = useState(null);
-	const [rulesArray, setRulesArray] = useState([]);
+function App(){
+  //const [data, setData] = useState("");
+  const [rBook, setRBook] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [search, setSearch] = useState('');
 
-	useEffect(()=>{
-		getRules()
-		.then((data)=>{
-			const lines = data.split('\n').map((line)=>line.trim());
-			setContents(parser.getContent(lines))
-			setRules(parser.getRules(lines));
-			setGlossary(parser.getGlossary(lines));
-			setRulesArray(parser.createRulesArray);
-			setIsLoading(false);
-		})
-		.catch((e)=>{
-			console.error(e.message);
-		})
-	},[]);
+  useEffect(()=>{
+    setIsLoading(true);
+    setTimeout(()=>{
+    dataService.getData()
+    .then((res)=>{
+      //setData(res)
+      setRBook(parser.parseData(res));
+      setIsLoading(false);
+    })
+    .catch((e)=>{
+      console.error(e)
+      setIsError(true);
+      setIsLoading(false);
+    })
+  },1000)
+  },[])
 
-	useEffect(()=>{
-		if (rules.length === 0)
-			return;
-		let last = 0;
-		rules[rules.length - 1].content.forEach((s)=>{
-			last = s.number;
-		})
-		setLastSection(last)
-	},[rules])
+  useEffect(()=>{
+    console.log(rBook)
+  },[rBook])
 
-	return (
-		<Container>
-				<Grid columns={2} divided stackable>
-					<Grid.Row>
-						<Grid.Column width={4}>
-							<TableOfContents
-								contents={contents}
-								selectedSection={selectedSection}
-								setSelectedSection={setSelectedSection}/>
-						</Grid.Column>
-						<Grid.Column width={12}>
-								{isLoading ? '' :
-								<MainContent 
-									selectedSection={selectedSection}
-									setSelectedSection={setSelectedSection}
-									rules={rules}
-									glossary={glossary}
-									lastSection={lastSection}
-									rulesArray={rulesArray}
-									/>
-								}
-								<Loader active={isLoading} />
-						</Grid.Column>
-					</Grid.Row>
-				</Grid>
-		</Container>
-  );
+  const handleInput = ({target})=>{
+    setSearch(target.value);
+  }
+
+  return (
+    <div>
+      <Segment inverted basic>
+        An unofficial Magic: The Gathering -rulebook
+      </Segment>
+      <Container fluid>
+        {/*<Loader active={isLoading}/>*/}
+        <Hide hide={!isError}>
+          <Icon name='x' size='massive' color='red' />
+        </Hide>
+        {rBook.headers && rBook.subHeaders && rBook.rules && <Contents rBook={rBook} search={search} setIsLoading={setIsLoading}/>}
+      </Container>
+    </div>
+  )
 }
 
 export default App;
