@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Input, Loader } from 'semantic-ui-react';
 import 'semantic-ui-css/semantic.min.css'
 

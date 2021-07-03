@@ -1,65 +1,87 @@
 import React, { useEffect, useState } from 'react';
-import { applySearchRules, applySearchHeaders, applySearchSubHeaders} from '../services/utils';
-import { Button, Container, Divider, Grid } from 'semantic-ui-react';
+import { applySearchRules, applySearchHeaders, applySearchSubHeaders, findRules} from '../services/utils';
+import { Divider, Grid } from 'semantic-ui-react';
 import Headers from './Headers';
-import SubHeaders from './Subheaders';
 import Rules from './Rules';
 import Searchbar from './Searchbar';
 
-const Content = ({rBook, setIsLoading})=>{
-  const [newRules, setNewRules] = useState([]);
+const Content = ({rBook})=>{
+  const [newRules, setNewRules] = useState(rBook.rules);
   const [newHeaders, setNewHeaders] = useState([]);
-  const [page, setPage] = useState(1);
   const [searchResultNumber, setSearchResultNumber] = useState(0);
-  const resultsAmount = 30;
   const [search, setSearch] = useState('');
+  const [searching, setSearching] = useState(false);
+  const dAmount = 30;
+  const [displayAmount, setDisplayAmount] = useState(dAmount);
+  const [headersActive, setHeadersActive] = useState("");
 
   useEffect(()=>{
-    setPage(1);
-  },[search])
-
-  useEffect(()=>{
-    setIsLoading(true);
-    const t = setTimeout(async ()=>{
-      setNewRules(applySearchRules(rBook.rules, search));
-    },100)
-    return ()=>{
-      clearTimeout(t);
+    setDisplayAmount(dAmount);
+    if (search.length !== 0)
+    {
+      setSearching(true);
+      const t = setTimeout(()=>{
+        setNewRules(applySearchRules(rBook.rules, search));
+        setSearching(false);
+      },500)
+      return ()=>{clearTimeout(t)}
     }
-  },[search, rBook.rules, page, setIsLoading])
+    setSearching(false);
+  },[search, rBook.rules])
+
+  const handleSearch = ({target})=>{
+    setSearch(target.value)
+    setSearching(false);
+    if (target.value === '')
+    {
+      setHeadersActive('');
+      setNewRules(rBook.rules);
+    }else
+      setHeadersActive('all');
+  }
 
   useEffect(()=>{
     setSearchResultNumber(newRules.length)
   },[newRules])
 
+  const showMore = ()=>{
+    setDisplayAmount(displayAmount + dAmount);
+  }
+
   // setnewheaders
   useEffect(()=>{
-    setIsLoading(true);
-    const t = setTimeout(async ()=>{
-      setNewHeaders(applySearchHeaders(rBook.headers, newRules, search));
-      setIsLoading(false);
-    }, 100)
-    return ()=>{
-      clearTimeout(t);
-    }
-  },[newRules, search, rBook.headers, setIsLoading])
+    setNewHeaders(applySearchHeaders(rBook.headers, newRules, search));
+  },[newRules, search, rBook.headers])
+
+  const subHeaderClick = (header)=>{
+    setSearch('');
+    setNewRules(findRules(rBook.rules, parseInt(header)));
+    setHeadersActive(header.substring(0,1));
+  }
 
   if (!rBook.headers || !rBook.subHeaders || !rBook.rules)
     return ('');
 
   return (
       <Grid stackable>
-        <Grid.Row columns={2}>
+        <Grid.Row columns={2} divided>
           <Grid.Column width={5}>
-            <Headers headers={newHeaders}/>
-            <SubHeaders headers={applySearchSubHeaders(rBook.subHeaders, newRules, search)}/>
+            <Headers
+              headers={newHeaders}
+              subHeaders={applySearchSubHeaders(rBook.subHeaders, newRules, search)}
+              subHeaderClick={subHeaderClick}
+              headersActive={headersActive}
+              />
           </Grid.Column>
-          <Grid.Column>
-          <Searchbar value={search} onChange={({target})=>{setSearch(target.value)}}/>
-          {searchResultNumber} results found
-          <Divider />
-            <Rules rules={newRules.slice(0, page * resultsAmount)}/>
-            {searchResultNumber >= page * resultsAmount && <Button icon='arrow down' onClick={()=>{setPage(page + 1)}}/>}
+          <Grid.Column width={11}>
+            <Grid.Row>
+              <Searchbar value={search} onChange={handleSearch} loading={searching}/>
+              {searchResultNumber} results found
+            </Grid.Row>
+            <Grid.Row>
+              <Divider />
+              <Rules rules={newRules} setSearch={setSearch} displayAmount={displayAmount} showMore={showMore}/>
+            </Grid.Row>
           </Grid.Column>
         </Grid.Row>
       </Grid>

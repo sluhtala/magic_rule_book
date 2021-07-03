@@ -1,13 +1,19 @@
 
-export const findRules = (rBook, subNumber)=>{
+export const findRules = (rules, subNumber)=>{
   const pattern = RegExp(`^${subNumber}[.]`);
-  const rules = rBook.rules.filter((rule)=>pattern.test(rule));
-  return rules;
+  const result = rules.filter((rule)=>pattern.test(rule.text));
+  return result;
 }
 
-export const findSubHeaders = (rBook, mainNumber) => {
-  const pattern = RegExp(`^${mainNumber}`);
-  const subHeaders = rBook.subHeaders.filter((sub)=>pattern.test(sub));
+export const findSubHeaders = (headers, mainNumber) => {
+  if (headers.length === 0)
+    return ;
+  const pattern = RegExp('^'+ mainNumber);
+  const subHeaders = headers.filter((sub)=>{
+    return (
+      pattern.test(sub.text)
+    )
+  });
   return subHeaders;
 }
 
