@@ -20,7 +20,7 @@ function parseData(data)
         return ;
       const headerNum = parseInt(paragraph.substr(0, 1));
       const subNum = parseInt(paragraph.substring(0, paragraph.indexOf('.')));
-      result.rules.push({id: i, text: paragraph, headerNum: headerNum, subNum: subNum});
+      result.rules.push({id: i, text: paragraph.replace('\u2013', '-'), headerNum: headerNum, subNum: subNum});
     }
   })
   return result;

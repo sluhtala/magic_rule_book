@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { applySearchRules, applySearchHeaders, applySearchSubHeaders, findRules} from '../services/utils';
-import { Divider, Grid } from 'semantic-ui-react';
+import { Divider, Grid, Header as UiHeader, Button } from 'semantic-ui-react';
 import Headers from './Headers';
 import Rules from './Rules';
 import Searchbar from './Searchbar';
@@ -14,6 +14,7 @@ const Content = ({rBook})=>{
   const dAmount = 30;
   const [displayAmount, setDisplayAmount] = useState(dAmount);
   const [headersActive, setHeadersActive] = useState("");
+  const [resultTitle, setResultTitle] = useState("Magic: The Gathering -rulebook")
 
   useEffect(()=>{
     setDisplayAmount(dAmount);
@@ -34,10 +35,16 @@ const Content = ({rBook})=>{
     setSearching(false);
     if (target.value === '')
     {
-      setHeadersActive('');
-      setNewRules(rBook.rules);
+		clearSearch();
     }else
       setHeadersActive('all');
+  }
+
+  const clearSearch = () =>{
+	  setSearch('');
+      setHeadersActive('');
+      setNewRules(rBook.rules);
+	  setResultTitle('Magic: The Gathering -rulebook');
   }
 
   useEffect(()=>{
@@ -48,7 +55,6 @@ const Content = ({rBook})=>{
     setDisplayAmount(displayAmount + dAmount);
   }
 
-  // setnewheaders
   useEffect(()=>{
     setNewHeaders(applySearchHeaders(rBook.headers, newRules, search));
   },[newRules, search, rBook.headers])
@@ -57,6 +63,7 @@ const Content = ({rBook})=>{
     setSearch('');
     setNewRules(findRules(rBook.rules, parseInt(header)));
     setHeadersActive(header.substring(0,1));
+	setResultTitle(header);
   }
 
   if (!rBook.headers || !rBook.subHeaders || !rBook.rules)
@@ -77,10 +84,12 @@ const Content = ({rBook})=>{
             <Grid.Row>
               <Searchbar value={search} onChange={handleSearch} loading={searching}/>
               {searchResultNumber} results found
+			  {search !== '' && <Button onClick={clearSearch} compact basic size='tiny'>clear</Button>}
             </Grid.Row>
             <Grid.Row>
               <Divider />
-              <Rules rules={newRules} setSearch={setSearch} displayAmount={displayAmount} showMore={showMore}/>
+				<UiHeader>{search ? `Search result for:'${search}'` : resultTitle}</UiHeader>
+				<Rules rules={newRules} setSearch={setSearch} displayAmount={displayAmount} showMore={showMore} rBook={rBook}/>
             </Grid.Row>
           </Grid.Column>
         </Grid.Row>

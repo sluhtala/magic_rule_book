@@ -21,7 +21,7 @@ export const applySearchRules =(rules, search)=>{
   if (search === '')
     return rules;
   else
-    return rules.filter((r)=>r.text.includes(search))
+    return rules.filter((r)=>r.text.toLowerCase().includes(search.toLowerCase()))
 }
 
 export const applySearchHeaders = (headers, rules, search)=>{
