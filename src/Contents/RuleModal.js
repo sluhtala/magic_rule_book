@@ -1,8 +1,6 @@
 import React, { useState, useEffect} from 'react';
 import { Container, Button, Header, Modal } from 'semantic-ui-react'
 
-
-
 const ModalContent = (props)=>{
 	const [rule, setRule] = useState(props.rules[props.index]);
 	const len = props.rules.length;
@@ -12,15 +10,12 @@ const ModalContent = (props)=>{
 	},[props.index, props.rules])
 
 	if (!rule)
-	return '';
-	
-	const number = rule.text.substring(0, rule.text.indexOf(' '))
-
-
+		return '';
+	const ruleNumber = rule.text.substring(0, rule.text.indexOf(' '))
 	return (
 		<>
 			<Modal.Header>
-			<Header>{number}</Header>
+			<Header>{ruleNumber}</Header>
 				</Modal.Header>
 			<Modal.Content>
 				<Container text fluid>
@@ -29,8 +24,10 @@ const ModalContent = (props)=>{
 			</Modal.Content>
 			{ len > 1 &&
 			<Modal.Actions>
-				<Button icon='arrow left' disabled={props.index <= 0} onClick={()=>{props.setIndex(props.index - 1)}}/>
-				<Button icon='arrow right' disabled={props.index >= len - 1} onClick={()=>{props.setIndex(props.index + 1)}}/>
+				<Button icon='arrow left' disabled={props.index <= 0}
+					onClick={()=>{props.setIndex(props.index - 1)}}/>
+				<Button icon='arrow right' disabled={props.index >= len - 1}
+					onClick={()=>{props.setIndex(props.index + 1)}}/>
 			</Modal.Actions>
 			}
 		</>
@@ -51,7 +48,8 @@ const RuleModal = (props)=>{
 				<ModalContent
 					rules={props.rules}
 					index={index}
-					setIndex={setIndex}/>}
+					setIndex={setIndex}/>
+			}
 			on='click'
 			trigger={props.trigger}>
 		</Modal>
