@@ -12,4 +12,4 @@ create a production build: npm run build
 
 build and copy to backend submodule: npm run pre-deploy
 
-
+run unit tests: npm run test
