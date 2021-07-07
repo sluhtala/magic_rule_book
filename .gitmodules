@@ -1,3 +1,4 @@
 [submodule "backend"]
 	path = backend
 	url = https://github.com/sluhtala/magic_rule_book_backend.git
+	update = rebase
