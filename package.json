@@ -20,7 +20,7 @@
     "start": "react-scripts start host=0.0.0.0",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "deploy": "npm run build && cp -r build proxy"
+    "pre-deploy": "npm run build && cp -rf build backend"
   },
   "eslintConfig": {
     "extends": [
