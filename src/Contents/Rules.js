@@ -31,11 +31,15 @@ const Rule = ({ rule, activeIndex, id, setActiveIndex, rBook }) => {
         setProcessedText(
             lines.map((l, i) => (
                 <div key={i}>
-                    {l.split(/([ (,)])/).map((w, i) => {
-                        return pattern.test(w) ? (
+                    {l.split(/([ ()])/).map((w, i) => {
+                        const word =
+                            w[w.length - 1] === ","
+                                ? w.substring(0, w.length - 1)
+                                : w;
+                        return pattern.test(word) ? (
                             <RuleModal
                                 key={i}
-                                word={w}
+                                word={word}
                                 rBook={rBook}
                                 trigger={
                                     <Item
