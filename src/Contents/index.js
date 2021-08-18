@@ -101,7 +101,7 @@ const Content = ({ rBook }) => {
                         </UiHeader>
                         <Rules
                             rules={newRules}
-                            setSearch={setSearch}
+                            search={search}
                             displayAmount={displayAmount}
                             showMore={() => {
                                 setDisplayAmount(displayAmount + dAmount);
